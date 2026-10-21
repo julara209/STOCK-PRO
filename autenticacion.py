@@ -1,0 +1,1 @@
+"""Autenticación: inicio de sesión y verificación de permisos según el rol."""

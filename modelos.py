@@ -1,0 +1,1 @@
+"""Entidades del dominio: Producto, Usuario y Movimiento."""
