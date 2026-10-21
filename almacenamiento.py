@@ -1,0 +1,1 @@
+"""Persistencia en JSON: guardar() y cargar() sobre data/inventario.json."""
