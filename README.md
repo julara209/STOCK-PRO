@@ -3,13 +3,13 @@
 Aplicación de consola en Python con roles de Administrador y Empleado.
 
 ### Estructura
-- `main.py`: menús e interacción por consola
-- `modelos.py`: Producto, Usuario, Movimiento
-- `gestor.py`: GestorInventario (reglas de negocio)
-- `autenticacion.py`: login y permisos
+- `main.py`: punto de entrada
+- `constantes.py`: constantes globales
+- `modelos/`: entidades del dominio (producto, usuario, movimiento)
+- `servicios/`: reglas de negocio (inventario, autenticación)
+- `consola/`: menús e interacción con el usuario
 - `almacenamiento.py`: persistencia JSON
 - `reportes.py`: reportes y exportación CSV
-- `constantes.py`: constantes globales
 - `tests/`: pruebas automatizadas
 
 ### Ejecutar
