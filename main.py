@@ -1,6 +1,6 @@
 """Interfaz de consola: menús, input() y print().
 Solo llama a los demás módulos."""
-from gestor import GestorInventario
+from servicios.inventario import GestorInventario
 
 
 def main():
