@@ -2,7 +2,7 @@
 Solo llama a los demás módulos."""
 from consola.menu_buscar import menu_buscar
 from servicios.inventario import GestorInventario
-
+from consola.menu_salidas import menu_registrar_salida
 
 def main():
     try:
@@ -16,6 +16,8 @@ def main():
         print("1. Registrar producto")
         print("2. Consultar productos")
         print("3. Buscar productos (código, nombre o categoría)")        
+        print("4. Actualizar producto")
+        print("5. Registrar salida de mercancía")
         print("0. Salir")
 
         opcion = input("Seleccione una opción: ")
@@ -60,6 +62,9 @@ def main():
                 print("Producto no encontrado.")
             else:
                 print(producto)
+
+        elif opcion == "5":
+            menu_registrar_salida(inventario)
 
         elif opcion == "0":
             print("Programa finalizado.")
