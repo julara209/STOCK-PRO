@@ -4,7 +4,7 @@ from consola.menu_actualizar import menu_actualizar
 from consola.menu_buscar import menu_buscar
 from consola.menu_salidas import menu_registrar_salida
 from servicios.inventario import GestorInventario
-
+from consola.menu_entrada import menu_entrada
 
 def main():
     try:
@@ -19,7 +19,8 @@ def main():
         print("2. Consultar productos")
         print("3. Buscar productos (código, nombre o categoría)")
         print("4. Actualizar producto")
-        print("5. Registrar salida de mercancía")
+        print("5. Registrar entrada de mercancía")
+        print("6. Registrar salida de mercancía")
         print("0. Salir")
 
         opcion = input("Seleccione una opción: ")
@@ -64,6 +65,9 @@ def main():
             menu_actualizar(inventario)
 
         elif opcion == "5":
+            menu_entrada(inventario)
+
+        elif opcion == "6":
             menu_registrar_salida(inventario)
 
         elif opcion == "0":

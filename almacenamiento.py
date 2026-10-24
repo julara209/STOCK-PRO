@@ -1,10 +1,10 @@
 """Persistencia en JSON: guardar() y cargar() sobre data/inventario.json."""
 
-
 import json
 from pathlib import Path
 
 from constantes import ARCHIVO_DATOS, ARCHIVO_MOVIMIENTOS
+
 
 def cargar():
     ruta = Path(ARCHIVO_DATOS)
@@ -24,7 +24,9 @@ def guardar(datos):
     with open(ruta, "w", encoding="utf-8") as archivo:
         json.dump(datos, archivo, ensure_ascii=False, indent=4)
 
+
 def cargar_movimientos():
+    """Carga el historial de movimientos desde JSON."""
     ruta = Path(ARCHIVO_MOVIMIENTOS)
 
     if not ruta.exists():
@@ -35,6 +37,7 @@ def cargar_movimientos():
 
 
 def guardar_movimientos(datos):
+    """Guarda el historial de movimientos en JSON."""
     ruta = Path(ARCHIVO_MOVIMIENTOS)
 
     ruta.parent.mkdir(parents=True, exist_ok=True)
