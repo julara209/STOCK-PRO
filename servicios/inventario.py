@@ -1,8 +1,8 @@
 """GestorInventario: reglas de negocio y gestión de la colección de productos
 y movimientos (registrar, actualizar, buscar, entradas y salidas)."""
 
-
 import almacenamiento
+from modelos.movimiento import Movimiento
 from modelos.producto import Producto
 from servicios.busqueda import buscar_productos as _buscar
 from servicios.actualizacion import (
@@ -97,4 +97,56 @@ class GestorInventario:
         almacenamiento.guardar(datos)
 
         self.productos = nuevos_productos
+        return actualizado
+
+    def registrar_entrada(self, codigo, cantidad, usuario_responsable):
+        """Suma existencias y registra la entrada en el historial."""
+
+        if (
+            isinstance(cantidad, bool)
+            or not isinstance(cantidad, int)
+            or cantidad <= 0
+        ):
+            raise ValueError(
+                "La cantidad recibida debe ser un entero mayor que cero."
+            )
+
+        producto = self.buscar_producto(codigo)
+
+        if producto is None:
+            raise ProductoNoEncontradoError(
+                f"El producto '{codigo}' no existe."
+            )
+
+        movimiento = Movimiento(
+            producto.codigo,
+            producto.nombre,
+            cantidad,
+            usuario_responsable
+        )
+
+        actualizado = Producto(
+            producto.codigo,
+            producto.nombre,
+            producto.categoria,
+            producto.precio,
+            producto.cantidad + cantidad
+        )
+
+        nuevos_productos = self.productos.copy()
+        posicion = nuevos_productos.index(producto)
+        nuevos_productos[posicion] = actualizado
+
+        movimientos = almacenamiento.cargar_movimientos()
+        nuevos_movimientos = movimientos + [movimiento.to_dict()]
+
+        # Guardar antes de actualizar la colección en memoria.
+        almacenamiento.guardar(
+            [p.to_dict() for p in nuevos_productos]
+        )
+
+        almacenamiento.guardar_movimientos(nuevos_movimientos)
+
+        self.productos = nuevos_productos
+
         return actualizado

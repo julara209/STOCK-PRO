@@ -2,6 +2,7 @@
 from pathlib import Path
 
 ARCHIVO_DATOS = Path("data") / "inventario.json"
+ARCHIVO_MOVIMIENTOS = Path("data") / "movimientos.json"
 CARPETA_EXPORTACIONES = Path("exportaciones")
 
 STOCK_BAJO = 5

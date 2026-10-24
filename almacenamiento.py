@@ -4,7 +4,7 @@
 import json
 from pathlib import Path
 
-from constantes import ARCHIVO_DATOS
+from constantes import ARCHIVO_DATOS, ARCHIVO_MOVIMIENTOS
 
 
 def cargar():
@@ -24,3 +24,29 @@ def guardar(datos):
 
     with open(ruta, "w", encoding="utf-8") as archivo:
         json.dump(datos, archivo, ensure_ascii=False, indent=4)
+        
+
+def cargar_movimientos():
+    """Carga el historial de movimientos desde JSON."""
+    ruta = Path(ARCHIVO_MOVIMIENTOS)
+
+    if not ruta.exists():
+        return []
+
+    with open(ruta, "r", encoding="utf-8") as archivo:
+        return json.load(archivo)
+
+
+def guardar_movimientos(movimientos):
+    """Guarda el historial de movimientos en JSON."""
+    ruta = Path(ARCHIVO_MOVIMIENTOS)
+    ruta.parent.mkdir(parents=True, exist_ok=True)
+
+    with open(ruta, "w", encoding="utf-8") as archivo:
+        json.dump(
+            movimientos,
+            archivo,
+            ensure_ascii=False,
+            indent=4
+        )
+
