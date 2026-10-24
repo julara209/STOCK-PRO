@@ -1,5 +1,6 @@
 """Interfaz de consola: menús, input() y print().
 Solo llama a los demás módulos."""
+from consola.menu_actualizar import menu_actualizar
 from consola.menu_buscar import menu_buscar
 from servicios.inventario import GestorInventario
 
@@ -15,7 +16,8 @@ def main():
         print("\n===== REGISTRAR PRODUCTO =====")
         print("1. Registrar producto")
         print("2. Consultar productos")
-        print("3. Buscar productos (código, nombre o categoría)")        
+        print("3. Buscar productos (código, nombre o categoría)")
+        print("4. Actualizar producto")
         print("0. Salir")
 
         opcion = input("Seleccione una opción: ")
@@ -56,10 +58,8 @@ def main():
         elif opcion == "3":
             menu_buscar(inventario)
 
-            if producto is None:
-                print("Producto no encontrado.")
-            else:
-                print(producto)
+        elif opcion == "4":
+            menu_actualizar(inventario)
 
         elif opcion == "0":
             print("Programa finalizado.")
