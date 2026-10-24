@@ -4,11 +4,11 @@ y movimientos (registrar, actualizar, buscar, entradas y salidas)."""
 
 import almacenamiento
 from modelos.producto import Producto
+from servicios.busqueda import buscar_productos as _buscar
 from servicios.actualizacion import (
     ProductoNoEncontradoError,
     construir_producto_actualizado,
 )
-
 
 class GestorInventario:
     def __init__(self):
@@ -28,6 +28,9 @@ class GestorInventario:
                 )
 
             codigos.append(producto.codigo)
+
+    def buscar_productos(self, codigo=None, nombre=None, categoria=None):
+        return _buscar(self.productos, codigo, nombre, categoria)
 
     def registrar_producto(
         self, codigo, nombre, categoria, precio, cantidad_inicial
