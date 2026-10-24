@@ -2,19 +2,26 @@
 y movimientos (registrar, actualizar, buscar, entradas y salidas)."""
 
 import almacenamiento
+from constantes import TIPO_ENTRADA, TIPO_SALIDA
 from modelos.movimiento import Movimiento
 from modelos.producto import Producto
 from servicios.busqueda import buscar_productos as _buscar
+from servicios.salidas import calcular_salida
 from servicios.actualizacion import (
     ProductoNoEncontradoError,
     construir_producto_actualizado,
 )
+
 
 class GestorInventario:
     def __init__(self):
         datos = almacenamiento.cargar()
 
         self.productos = []
+        self.movimientos = [
+            Movimiento.from_dict(dato)
+            for dato in almacenamiento.cargar_movimientos()
+        ]
 
         for dato in datos:
             self.productos.append(Producto.from_dict(dato))
@@ -28,9 +35,6 @@ class GestorInventario:
                 )
 
             codigos.append(producto.codigo)
-
-    def buscar_productos(self, codigo=None, nombre=None, categoria=None):
-        return _buscar(self.productos, codigo, nombre, categoria)
 
     def registrar_producto(
         self, codigo, nombre, categoria, precio, cantidad_inicial
@@ -99,8 +103,12 @@ class GestorInventario:
         self.productos = nuevos_productos
         return actualizado
 
+    def buscar_productos(self, codigo=None, nombre=None, categoria=None):
+        return _buscar(self.productos, codigo, nombre, categoria)
+
     def registrar_entrada(self, codigo, cantidad, usuario_responsable):
         """Suma existencias y registra la entrada en el historial."""
+        codigo = codigo.strip()
 
         if (
             isinstance(cantidad, bool)
@@ -111,18 +119,27 @@ class GestorInventario:
                 "La cantidad recibida debe ser un entero mayor que cero."
             )
 
-        producto = self.buscar_producto(codigo)
+        posicion = None
+        for i, producto in enumerate(self.productos):
+            if producto.codigo == codigo:
+                posicion = i
+                break
 
-        if producto is None:
+        if posicion is None:
             raise ProductoNoEncontradoError(
                 f"El producto '{codigo}' no existe."
             )
 
+        producto = self.productos[posicion]
+
+        # Si el usuario es inválido, Movimiento lanza ValueError y no se
+        # modifica ni la memoria ni los archivos.
         movimiento = Movimiento(
-            producto.codigo,
-            producto.nombre,
+            f"MOV-{len(self.movimientos) + 1:04d}",
+            TIPO_ENTRADA,
+            codigo,
             cantidad,
-            usuario_responsable
+            usuario_responsable,
         )
 
         actualizado = Producto(
@@ -130,23 +147,68 @@ class GestorInventario:
             producto.nombre,
             producto.categoria,
             producto.precio,
-            producto.cantidad + cantidad
+            producto.cantidad + cantidad,
         )
 
         nuevos_productos = self.productos.copy()
-        posicion = nuevos_productos.index(producto)
         nuevos_productos[posicion] = actualizado
+        nuevos_movimientos = self.movimientos + [movimiento]
 
-        movimientos = almacenamiento.cargar_movimientos()
-        nuevos_movimientos = movimientos + [movimiento.to_dict()]
+        datos_anteriores = [p.to_dict() for p in self.productos]
 
-        # Guardar antes de actualizar la colección en memoria.
-        almacenamiento.guardar(
-            [p.to_dict() for p in nuevos_productos]
-        )
-
-        almacenamiento.guardar_movimientos(nuevos_movimientos)
+        almacenamiento.guardar([p.to_dict() for p in nuevos_productos])
+        try:
+            almacenamiento.guardar_movimientos(
+                [m.to_dict() for m in nuevos_movimientos]
+            )
+        except OSError:
+            # Si falla el historial, se devuelven las existencias anteriores.
+            almacenamiento.guardar(datos_anteriores)
+            raise
 
         self.productos = nuevos_productos
-
+        self.movimientos = nuevos_movimientos
         return actualizado
+
+    def registrar_salida(self, codigo, cantidad, usuario):
+        codigo = codigo.strip()
+
+        posicion = None
+        for i, producto in enumerate(self.productos):
+            if producto.codigo == codigo:
+                posicion = i
+                break
+
+        if posicion is None:
+            raise ValueError(f"El producto '{codigo}' no existe.")
+
+        # Estas dos líneas validan todo (cantidad, existencias, usuario).
+        # Si algo falla, no se modifica ni la memoria ni los archivos.
+        producto_actualizado = calcular_salida(self.productos[posicion], cantidad)
+        movimiento = Movimiento(
+            f"MOV-{len(self.movimientos) + 1:04d}",
+            TIPO_SALIDA,
+            codigo,
+            cantidad,
+            usuario,
+        )
+
+        nuevos_productos = self.productos.copy()
+        nuevos_productos[posicion] = producto_actualizado
+        nuevos_movimientos = self.movimientos + [movimiento]
+
+        datos_anteriores = [producto.to_dict() for producto in self.productos]
+
+        almacenamiento.guardar([p.to_dict() for p in nuevos_productos])
+        try:
+            almacenamiento.guardar_movimientos(
+                [m.to_dict() for m in nuevos_movimientos]
+            )
+        except OSError:
+            # Si falla el historial, se devuelven las existencias anteriores.
+            almacenamiento.guardar(datos_anteriores)
+            raise
+
+        self.productos = nuevos_productos
+        self.movimientos = nuevos_movimientos
+        return movimiento
