@@ -3,18 +3,22 @@ y movimientos (registrar, actualizar, buscar, entradas y salidas)."""
 
 
 import almacenamiento
-from modelos.producto import Producto
-from servicios.busqueda import buscar_productos as _buscar
 from constantes import TIPO_SALIDA
 from modelos.movimiento import Movimiento
+from modelos.producto import Producto
+from servicios.busqueda import buscar_productos as _buscar
 from servicios.salidas import calcular_salida
+from servicios.actualizacion import (
+    ProductoNoEncontradoError,
+    construir_producto_actualizado,
+)
+
 
 class GestorInventario:
     def __init__(self):
         datos = almacenamiento.cargar()
 
         self.productos = []
-
         self.movimientos = [
             Movimiento.from_dict(dato)
             for dato in almacenamiento.cargar_movimientos()
@@ -32,9 +36,6 @@ class GestorInventario:
                 )
 
             codigos.append(producto.codigo)
-
-    def buscar_productos(self, codigo=None, nombre=None, categoria=None):
-        return _buscar(self.productos, codigo, nombre, categoria)
 
     def registrar_producto(
         self, codigo, nombre, categoria, precio, cantidad_inicial
@@ -72,6 +73,40 @@ class GestorInventario:
         for producto in self.productos:
             if producto.codigo == codigo.strip():
                 return producto
+
+        return None
+
+    def actualizar_producto(self, codigo, nombre=None, categoria=None,
+                            precio=None, entrada=None):
+        codigo = codigo.strip()
+
+        posicion = None
+        for i, producto in enumerate(self.productos):
+            if producto.codigo == codigo:
+                posicion = i
+                break
+
+        if posicion is None:
+            raise ProductoNoEncontradoError(f"El producto '{codigo}' no existe.")
+
+        # Si algún dato es inválido, esta línea lanza ValueError y no se
+        # modifica ni la memoria ni el archivo.
+        actualizado = construir_producto_actualizado(
+            self.productos[posicion], nombre, categoria, precio, entrada
+        )
+
+        nuevos_productos = self.productos.copy()
+        nuevos_productos[posicion] = actualizado
+
+        datos = [producto.to_dict() for producto in nuevos_productos]
+        almacenamiento.guardar(datos)
+
+        self.productos = nuevos_productos
+        return actualizado
+
+    def buscar_productos(self, codigo=None, nombre=None, categoria=None):
+        return _buscar(self.productos, codigo, nombre, categoria)
+
     def registrar_salida(self, codigo, cantidad, usuario):
         codigo = codigo.strip()
 
@@ -85,6 +120,7 @@ class GestorInventario:
             raise ValueError(f"El producto '{codigo}' no existe.")
 
         # Estas dos líneas validan todo (cantidad, existencias, usuario).
+        # Si algo falla, no se modifica ni la memoria ni los archivos.
         producto_actualizado = calcular_salida(self.productos[posicion], cantidad)
         movimiento = Movimiento(
             f"MOV-{len(self.movimientos) + 1:04d}",
@@ -113,4 +149,3 @@ class GestorInventario:
         self.productos = nuevos_productos
         self.movimientos = nuevos_movimientos
         return movimiento
-        return None
