@@ -52,7 +52,7 @@ def _cargar_estado():
         if clave not in datos or not isinstance(datos[clave], list):
             raise ValueError(
                 f"El archivo {ruta} tiene una estructura inválida. "
-                "Falta la sección '{clave}' o no es una lista."
+                f"Falta la sección '{clave}' o no es una lista."
             )
 
     return datos
