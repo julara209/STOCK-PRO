@@ -2,11 +2,13 @@
 Solo llama a los demás módulos."""
 from consola.menu_actualizar import menu_actualizar
 from consola.menu_buscar import menu_buscar
-from consola.menu_salidas import menu_registrar_salida
-from servicios.inventario import GestorInventario
 from consola.menu_entrada import menu_entrada
+from consola.menu_exportar import menu_exportar
 from consola.menu_historial import menu_historial
 from consola.menu_reportes import menu_reportes
+from consola.menu_salidas import menu_registrar_salida
+from servicios.inventario import GestorInventario
+
 
 def main():
     try:
@@ -25,6 +27,7 @@ def main():
         print("6. Registrar salida de mercancía")
         print("7. Consultar historial de movimientos")
         print("8. Reportes de inventario")
+        print("9. Exportar a CSV")
         print("0. Salir")
 
         opcion = input("Seleccione una opción: ")
@@ -79,7 +82,10 @@ def main():
 
         elif opcion == "8":
             menu_reportes(inventario)
-                    
+
+        elif opcion == "9":
+            menu_exportar(inventario)
+
         elif opcion == "0":
             print("Programa finalizado.")
             break
