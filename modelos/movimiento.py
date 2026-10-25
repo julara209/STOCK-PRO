@@ -1,4 +1,4 @@
-"""Entidad Movimiento: entradas y salidas de mercancía (HU-005, HU-006)."""
+"""Entidad Movimiento: entradas y salidas de mercancía (HU-005, HU-006, HU-012)."""
 from datetime import datetime
 
 from constantes import TIPO_ENTRADA, TIPO_SALIDA
@@ -30,6 +30,11 @@ class Movimiento:
         self.cantidad = cantidad
         self.usuario = usuario.strip()
         self.fecha = fecha or datetime.now().isoformat(timespec="seconds")
+
+    @property
+    def usuario_responsable(self):
+        """Alias de `usuario`, para el código de HU-012 que usa este nombre."""
+        return self.usuario
 
     def to_dict(self):
         return {
