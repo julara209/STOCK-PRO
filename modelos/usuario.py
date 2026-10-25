@@ -44,5 +44,37 @@ class Usuario:
         hash_calculado, _ = generar_hash(contrasena, bytes.fromhex(self._sal))
         return hmac.compare_digest(hash_calculado, self._hash)
 
+    def to_dict(self) -> dict:
+        """Datos para el JSON. Guarda el hash y la sal, nunca la contraseña."""
+        return {
+            "nombre_usuario": self.nombre_usuario,
+            "rol": self.rol,
+            "hash": self._hash,
+            "sal": self._sal,
+        }
+
+    @classmethod
+    def from_dict(cls, datos: dict):
+        """Reconstruye un usuario guardado. Lanza ValueError si los datos no sirven."""
+        try:
+            nombre = datos["nombre_usuario"]
+            rol = datos["rol"]
+            hash_hex = datos["hash"]
+            sal_hex = datos["sal"]
+            bytes.fromhex(hash_hex)
+            bytes.fromhex(sal_hex)
+        except (KeyError, TypeError, ValueError) as error:
+            raise ValueError("Los datos de un usuario guardado están incompletos o dañados.") from error
+
+        if rol not in ROLES_VALIDOS or not isinstance(nombre, str) or not nombre.strip():
+            raise ValueError("Los datos de un usuario guardado están incompletos o dañados.")
+
+        usuario = cls.__new__(cls)  # no se llama a __init__: no hay contraseña que hashear
+        usuario.nombre_usuario = nombre
+        usuario.rol = rol
+        usuario._hash = hash_hex
+        usuario._sal = sal_hex
+        return usuario
+
     def __repr__(self):
         return f"Usuario({self.nombre_usuario!r}, rol={self.rol!r})"
