@@ -1,6 +1,7 @@
 """Servicio de registro y validación de usuarios (HU-004)."""
 import re
 
+import almacenamiento
 from modelos.usuario import (
     ROL_ADMINISTRADOR,
     ROLES_VALIDOS,
@@ -68,3 +69,22 @@ def iniciar_sesion(usuarios: list, nombre: str, contrasena: str):
         if u.nombre_usuario.lower() == nombre.strip().lower():
             return u if u.verificar_contrasena(contrasena) else None
     return None
+
+
+def cargar_usuarios() -> list:
+    """Usuarios guardados en data/inventario.json, como objetos Usuario."""
+    return [Usuario.from_dict(dato) for dato in almacenamiento.cargar_usuarios()]
+
+
+def registrar_y_guardar(usuarios: list, nombre: str, contrasena: str, rol: str,
+                        solicitante: Usuario = None) -> Usuario:
+    """Registra un usuario y lo guarda en el JSON.
+
+    Todo o nada: se valida sobre una copia de la lista y solo si el guardado
+    funciona se agrega el usuario a la lista real.
+    """
+    candidatos = list(usuarios)
+    nuevo = registrar_usuario(candidatos, nombre, contrasena, rol, solicitante)
+    almacenamiento.guardar_usuarios([u.to_dict() for u in candidatos])
+    usuarios.append(nuevo)
+    return nuevo

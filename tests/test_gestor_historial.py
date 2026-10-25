@@ -15,7 +15,7 @@ class TestConsultarHistorial(unittest.TestCase):
                 "nombre_producto": "Teclado",
                 "cantidad": 10,
                 "fecha": "2026-10-20T10:00:00",
-                "usuario_responsable": "Administrador"
+                "usuario": "Administrador"
             },
             {
                 "id_movimiento": "MOV-002",
@@ -24,7 +24,7 @@ class TestConsultarHistorial(unittest.TestCase):
                 "nombre_producto": "Teclado",
                 "cantidad": 2,
                 "fecha": "2026-10-21T11:00:00",
-                "usuario_responsable": "Empleado"
+                "usuario": "Empleado"
             },
             {
                 "id_movimiento": "MOV-003",
@@ -33,7 +33,7 @@ class TestConsultarHistorial(unittest.TestCase):
                 "nombre_producto": "Mouse",
                 "cantidad": 5,
                 "fecha": "2026-10-22T12:00:00",
-                "usuario_responsable": "Administrador"
+                "usuario": "Administrador"
             }
         ]
 
