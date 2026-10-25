@@ -2,7 +2,7 @@
 las reglas de negocio están en servicios/salidas.py y en el gestor."""
 
 
-def menu_registrar_salida(gestor):
+def menu_registrar_salida(gestor, usuario=None):
     print("\n--- Registrar salida de mercancía ---")
     codigo = input("Código del producto: ").strip()
 
@@ -20,9 +20,9 @@ def menu_registrar_salida(gestor):
         except ValueError:
             raise ValueError(f"'{texto}' no es un número entero válido.") from None
 
-        # Provisional: cuando exista el inicio de sesión (HU-007), el usuario
-        # se tomará de la sesión y ya no se pedirá aquí.
-        usuario = input("Usuario responsable: ").strip()
+        # Con sesión iniciada, el responsable es el usuario de la sesión.
+        if usuario is None:
+            usuario = input("Usuario responsable: ").strip()
 
         movimiento = gestor.registrar_salida(codigo, cantidad, usuario)
     except ValueError as error:

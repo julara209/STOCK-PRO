@@ -19,12 +19,13 @@ def _pedir_cantidad():
         return cantidad
 
 
-def menu_entrada(gestor):
+def menu_entrada(gestor, usuario=None):
     print("\n--- Registrar entrada de mercancía ---")
 
     codigo = input("Código del producto: ").strip()
     cantidad = _pedir_cantidad()
-    usuario = input("Usuario responsable: ").strip()
+    if usuario is None:
+        usuario = input("Usuario responsable: ").strip()
 
     try:
         producto = gestor.registrar_entrada(
