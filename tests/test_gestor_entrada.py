@@ -73,10 +73,10 @@ class TestGestorEntrada(unittest.TestCase):
         self.assertEqual(len(historial), 1)
         self.assertEqual(historial[0]["tipo"], "Entrada")
         self.assertEqual(historial[0]["codigo_producto"], "A01")
-        self.assertEqual(historial[0]["nombre_producto"], "Arroz")
+        self.assertEqual(historial[0]["id_movimiento"], "MOV-0001")
         self.assertEqual(historial[0]["cantidad"], 5)
         self.assertEqual(
-            historial[0]["usuario_responsable"], "empleado1"
+            historial[0]["usuario"], "empleado1"
         )
         self.assertIn("fecha", historial[0])
 

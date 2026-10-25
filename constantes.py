@@ -13,5 +13,3 @@ ROLES_VALIDOS = (ROL_ADMINISTRADOR, ROL_EMPLEADO)
 
 TIPO_ENTRADA = "Entrada"
 TIPO_SALIDA = "Salida"
-
-ARCHIVO_MOVIMIENTOS = Path("data") / "movimientos.json"
