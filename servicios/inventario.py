@@ -68,6 +68,20 @@ class GestorInventario:
     def consultar_productos(self):
         return self.productos.copy()
 
+    # HU-009: consultar el inventario completo (solo lectura).
+    def listar_productos(self):
+        """Todos los productos con sus existencias actuales.
+
+        Devuelve una copia de la lista: no modifica el inventario y
+        refleja las entradas y salidas ya registradas.
+        """
+        return self.productos.copy()
+
+    # HU-008: consultar productos agotados (solo lectura).
+    def productos_agotados(self):
+        """Productos con existencias (cantidad) iguales a cero."""
+        return [p for p in self.productos if p.cantidad == 0]
+
     def buscar_producto(self, codigo):
         for producto in self.productos:
             if producto.codigo == codigo.strip():
@@ -102,6 +116,8 @@ class GestorInventario:
 
         self.productos = nuevos_productos
         return actualizado
+    
+    
 
     def buscar_productos(self, codigo=None, nombre=None, categoria=None):
         return _buscar(self.productos, codigo, nombre, categoria)
