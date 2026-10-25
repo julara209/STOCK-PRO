@@ -101,6 +101,13 @@ class GestorInventario:
 
     def registrar_entrada(self, codigo, cantidad, usuario_responsable):
         """Suma existencias y registra la entrada en el historial."""
+        if (
+            not isinstance(usuario_responsable, str)
+            or not usuario_responsable.strip()
+            ):
+            raise ValueError(
+                "El usuario responsable no puede estar vacío."
+            )
 
         if (
             isinstance(cantidad, bool)
@@ -119,11 +126,12 @@ class GestorInventario:
             )
 
         movimiento = Movimiento(
+            "Entrada",
             producto.codigo,
-            producto.nombre,
             cantidad,
-            usuario_responsable
-        )
+            usuario_responsable.strip(),
+            nombre_producto=producto.nombre
+            )
 
         actualizado = Producto(
             producto.codigo,
@@ -150,3 +158,38 @@ class GestorInventario:
         self.productos = nuevos_productos
 
         return actualizado
+
+    def consultar_historial_movimientos(self, codigo_producto=None, tipo=None):
+        """Consulta el historial sin modificar el inventario ni los archivos."""
+        movimientos = almacenamiento.cargar_movimientos()
+
+        resultado = []
+
+        if codigo_producto is not None:
+            codigo_producto = codigo_producto.strip()
+
+        if tipo is not None:
+            tipo = tipo.strip().lower()
+
+        for movimiento in movimientos:
+            codigo = movimiento.get(
+                "codigo_producto",
+                movimiento.get("codigo", "")
+            )
+            tipo_movimiento = movimiento.get("tipo", "")
+
+            if (
+                codigo_producto is not None
+                and codigo != codigo_producto
+            ):
+                continue
+
+            if (
+                tipo is not None
+                and tipo_movimiento.strip().lower() != tipo
+            ):
+                continue
+
+            resultado.append(movimiento.copy())
+
+        return resultado
