@@ -6,6 +6,7 @@ from modelos.usuario import (
     ROL_ADMINISTRADOR,
     ROLES_VALIDOS,
     Usuario,
+    crear_usuario,
 )
 
 # Reglas de seguridad de la contraseña (ajustar o mover a constantes.py)
@@ -37,7 +38,7 @@ def validar_rol(rol: str) -> None:
 
 def validar_permiso_solicitante(solicitante, rol_nuevo: str) -> None:
     """Un empleado no puede crear administradores ni otorgarse permisos."""
-    if solicitante is not None and solicitante.rol != ROL_ADMINISTRADOR:
+    if solicitante is not None and not solicitante.tiene_permiso("registrar_usuarios"):
         raise PermissionError("Solo un administrador puede registrar usuarios.")
 
 
@@ -58,7 +59,7 @@ def registrar_usuario(usuarios: list, nombre: str, contrasena: str, rol: str,
     validar_contrasena(contrasena)
     validar_rol(rol)
 
-    nuevo = Usuario(nombre.strip(), contrasena, rol)
+    nuevo = crear_usuario(nombre.strip(), contrasena, rol)
     usuarios.append(nuevo)  # solo se llega aquí si todo fue válido
     return nuevo
 

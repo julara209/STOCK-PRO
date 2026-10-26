@@ -49,7 +49,7 @@ def menu_por_rol(auth, acciones=None, entrada=input, salida=print):
     acciones = acciones or {}
     usuario = auth.usuario_actual
     opciones = opciones_del_rol(usuario)
-    titulo = "MENÚ DE ADMINISTRACIÓN" if usuario.rol == ROL_ADMINISTRADOR else "MENÚ DE EMPLEADO"
+    titulo = usuario.titulo_menu()
 
     while True:
         salida(f"\n=== {titulo} ({usuario.nombre_usuario}) ===")
@@ -69,7 +69,7 @@ def menu_por_rol(auth, acciones=None, entrada=input, salida=print):
             return
 
         try:
-            auth.requiere_permiso(permiso)  # se valida ANTES de ejecutar
+            auth.requiere_permiso(permiso)  
         except PermissionError as e:
             salida(f"Acceso denegado: {e}")
             continue
