@@ -60,6 +60,7 @@ def _cargar_estado():
 
 def _guardar_estado(estado):
     ruta = Path(ARCHIVO_DATOS)
+    temporal = ruta.with_name(ruta.name + ".tmp")
 
     # Comprobar primero que el archivo existente se pueda leer.
     # Si está dañado, no se abre para escritura.
@@ -68,17 +69,23 @@ def _guardar_estado(estado):
     try:
         ruta.parent.mkdir(parents=True, exist_ok=True)
 
-        with open(ruta, "w", encoding="utf-8") as archivo:
+        # Se escribe en un archivo temporal y solo al terminar se reemplaza el
+        # original: si algo falla a mitad de camino, el JSON bueno no se pierde.
+        with open(temporal, "w", encoding="utf-8") as archivo:
             json.dump(
                 estado,
                 archivo,
                 ensure_ascii=False,
                 indent=4
             )
+        temporal.replace(ruta)
     except OSError as error:
         raise OSError(
             f"No se pudo guardar el archivo {ruta}: {error}"
         ) from error
+    finally:
+        # Se ejecuta siempre: si hubo un error, no queda el temporal huérfano.
+        temporal.unlink(missing_ok=True)
 
 
 def cargar():
